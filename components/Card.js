@@ -10,7 +10,7 @@ import { useFonts } from "expo-font";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome, AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 
-export const Card = ({ item }) => {
+export const Card = ({ item, route }) => {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
@@ -23,7 +23,7 @@ export const Card = ({ item }) => {
 
   return (
     <View key={item.id} style={styles.item}>
-      <Image source={{uri: item.photo}} style={styles.photo} />
+      <Image source={{ uri: item.photo }} style={styles.photo} />
       <Text style={styles.caption}>{item.title}</Text>
       <View style={styles.info}>
         <View style={styles.stat}>
@@ -31,17 +31,37 @@ export const Card = ({ item }) => {
             style={styles.block}
             onPress={() => navigation.navigate("Comments")}
           >
-            <FontAwesome name="comment" size={24} color="#FF6C00" />
-            <Text style={styles.text}>{item.comments}</Text>
+            <FontAwesome
+              name="comment"
+              size={24}
+              color={item.comments === 0 ? "#BDBDBD" : "#FF6C00"}
+            />
+            <Text
+              style={
+                item.comments === 0
+                  ? { ...styles.text, color: "#BDBDBD" }
+                  : { ...styles.text, color: "#212121" }
+              }
+            >
+              {item.comments}
+            </Text>
           </TouchableOpacity>
-          <View style={styles.block}>
-            <AntDesign name="like2" size={24} color="#FF6C00" />
-            <Text style={styles.text}>{item.likes}</Text>
-          </View>
+          {route !== "Posts" && (
+            <View style={styles.block}>
+              <AntDesign name="like2" size={24} color="#FF6C00" />
+              <Text style={styles.text}>{item.likes}</Text>
+            </View>
+          )}
         </View>
         <View style={styles.block}>
           <SimpleLineIcons name="location-pin" size={24} color="#BDBDBD" />
-          <Text style={{ ...styles.text, textDecorationLine: "underline" }}>
+          <Text
+            style={{
+              ...styles.text,
+              textDecorationLine: "underline",
+              color: "#212121",
+            }}
+          >
             {item.location}
           </Text>
         </View>
@@ -79,7 +99,6 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: "Roboto-Regular",
     fontSize: 16,
-    color: "#212121",
   },
   photoBox: {
     position: "absolute",

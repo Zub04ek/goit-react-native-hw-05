@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Dimensions } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useFonts } from "expo-font";
 import { Card } from "../../components/Card";
-import { useRoute } from "@react-navigation/native";
-import { postsData } from "../../data/posts";
 
-const PostsScreen = ({route}) => {
-  const [posts, setPosts] = useState(postsData);
-  console.log('route.params', route.params)
+const PostsScreen = ({ route }) => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    if (route.params) {
+      setPosts((prevPosts) => [
+        ...prevPosts,
+        {
+          ...route.params.state,
+          comments: 0,
+        },
+      ]);
+    }
+  }, [route.params]);
 
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("../../assets/fonts/Roboto-Regular.ttf"),
@@ -24,9 +33,9 @@ const PostsScreen = ({route}) => {
         style={styles.list}
         data={posts}
         renderItem={({ item }) => {
-          return posts.length > 0 && <Card item={item} />;
+          return posts.length > 0 && <Card item={item} route={route.name} />;
         }}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         ListHeaderComponent={() => (
           <View style={styles.userCard}>
             <View style={styles.userPhoto}></View>

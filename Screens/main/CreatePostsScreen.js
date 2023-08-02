@@ -16,7 +16,6 @@ import {
 import { AntDesign, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
-import { postsData } from "../../data/posts";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 
@@ -106,15 +105,6 @@ const CreatePostsScreen = () => {
 
   const publish = () => {
     setIsShowKeyboard(false);
-    console.log("state", state);
-    // postsData.push({
-    //   id: state.title,
-    //   photo: state.photo,
-    //   title: state.title,
-    //   location: state.location,
-    //   comments: 0,
-    //   likes: 0,
-    // });
     navigation.navigate("Posts", {state});
     Keyboard.dismiss();
     setState(initialState);
