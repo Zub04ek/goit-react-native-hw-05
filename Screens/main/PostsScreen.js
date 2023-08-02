@@ -5,8 +5,9 @@ import { Card } from "../../components/Card";
 import { useRoute } from "@react-navigation/native";
 import { postsData } from "../../data/posts";
 
-const PostsScreen = () => {
+const PostsScreen = ({route}) => {
   const [posts, setPosts] = useState(postsData);
+  console.log('route.params', route.params)
 
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("../../assets/fonts/Roboto-Regular.ttf"),
