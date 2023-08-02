@@ -3,14 +3,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
-  Keyboard,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Image,
   Dimensions,
-  ScrollView,
-  FlatList,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { useNavigation } from "@react-navigation/native";
@@ -29,7 +23,7 @@ export const Card = ({ item }) => {
 
   return (
     <View key={item.id} style={styles.item}>
-      <Image source={item.photo} style={styles.photo} />
+      <Image source={{uri: item.photo}} style={styles.photo} />
       <Text style={styles.caption}>{item.title}</Text>
       <View style={styles.info}>
         <View style={styles.stat}>
