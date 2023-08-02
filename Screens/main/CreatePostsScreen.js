@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -17,6 +17,8 @@ import { AntDesign, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
 import { postsData } from "../../data/posts";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 
 const initialState = {
   photo: null,
@@ -26,8 +28,11 @@ const initialState = {
 
 const CreatePostsScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
+  const [camera, setCamera] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
   const [isInputFocused, setInputFocused] = useState({
     title: false,
     location: false,
@@ -39,9 +44,34 @@ const CreatePostsScreen = () => {
     "Roboto-Medium": require("../../assets/fonts/Roboto-Medium.ttf"),
   });
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
   if (!fontsLoaded) {
     return null;
   }
+
+  const takePhoto = async () => {
+    if (!hasPermission) {
+      return;
+    }
+    const photo = await camera.takePictureAsync();
+    setState((prevState) => {
+      return { ...prevState, photo: photo.uri };
+    });
+  };
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -58,7 +88,13 @@ const CreatePostsScreen = () => {
     }
   };
 
-  const imageSource = state.photo && { uri: state.photo };
+  // const editPhoto = () => {
+  //   setState((prevState) => {
+  //       return { ...prevState, photo: ''};
+  //   });
+  //   console.log('edit')
+    
+  // }
 
   const allDataFilled = () => {
     if (state.photo && state.title && state.location) {
@@ -71,15 +107,15 @@ const CreatePostsScreen = () => {
   const publish = () => {
     setIsShowKeyboard(false);
     console.log("state", state);
-    postsData.push({
-      id: state.title,
-      photo: state.photo,
-      title: state.title,
-      location: state.location,
-      comments: 0,
-      likes: 0,
-    });
-    navigation.navigate("Posts");
+    // postsData.push({
+    //   id: state.title,
+    //   photo: state.photo,
+    //   title: state.title,
+    //   location: state.location,
+    //   comments: 0,
+    //   likes: 0,
+    // });
+    navigation.navigate("Posts", {state});
     Keyboard.dismiss();
     setState(initialState);
     setIsFormFilled(false);
@@ -101,31 +137,42 @@ const CreatePostsScreen = () => {
         <View style={styles.container}>
           <ScrollView>
             <View>
-              <View style={styles.photoBox}>
-                {state.photo && (
-                  <Image source={imageSource} style={styles.photo} />
+              <View style={{ borderRadius: 8, overflow: "hidden" }}>
+                {isFocused && (
+                  <Camera style={styles.photoBox} ref={setCamera}>
+                    {state.photo && (
+                      <View style={{ borderRadius: 8 }}>
+                        <Image
+                          source={{ uri: state.photo }}
+                          style={styles.photo}
+                        />
+                      </View>
+                    )}
+                    <TouchableOpacity
+                      style={
+                        !state.photo
+                          ? { ...styles.camera, backgroundColor: "#FFFFFF" }
+                          : {
+                              ...styles.camera,
+                              backgroundColor: "rgba(255, 255, 255, 0.30)",
+                            }
+                      }
+                      onPress={takePhoto}
+                    >
+                      <MaterialIcons
+                        name="photo-camera"
+                        size={24}
+                        color={!state.photo ? "#BDBDBD" : "#FFFFFF"}
+                      />
+                    </TouchableOpacity>
+                  </Camera>
                 )}
-                <TouchableOpacity
-                  style={
-                    !state.photo
-                      ? { ...styles.camera, backgroundColor: "#FFFFFF" }
-                      : {
-                          ...styles.camera,
-                          backgroundColor: "rgba(255, 255, 255, 0.30)",
-                        }
-                  }
-                  onPress={pickImageAsync}
-                >
-                  <MaterialIcons
-                    name="photo-camera"
-                    size={24}
-                    color={!state.photo ? "#BDBDBD" : "#FFFFFF"}
-                  />
-                </TouchableOpacity>
               </View>
-              <Text style={styles.caption}>
-                {state.photo ? "Edit photo" : "Upload photo"}
-              </Text>
+              <TouchableOpacity onPress={pickImageAsync}>
+                <Text style={styles.caption}>
+                  {state.photo ? "Edit photo" : "Upload photo"}
+                </Text>
+              </TouchableOpacity>
             </View>
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : ""}
