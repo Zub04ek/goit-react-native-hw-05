@@ -53,7 +53,11 @@ export const Card = ({ item, route }) => {
             </View>
           )}
         </View>
-        <View style={styles.block}>
+
+        <TouchableOpacity
+          style={styles.block}
+          onPress={() => navigation.navigate("Map", {location: item.location})}
+        >
           <SimpleLineIcons name="location-pin" size={24} color="#BDBDBD" />
           <Text
             style={{
@@ -62,9 +66,9 @@ export const Card = ({ item, route }) => {
               color: "#212121",
             }}
           >
-            {item.location}
+            {item.location.caption}
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
