@@ -6,12 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
-  Keyboard,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Image,
   Dimensions,
-  ScrollView,
   FlatList,
 } from "react-native";
 import { useFonts } from "expo-font";
@@ -20,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Card } from "../../components/Card";
 import { postsData } from "../../data/posts";
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route }) => {
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -61,8 +57,8 @@ const ProfileScreen = () => {
         <FlatList
           style={styles.list}
           data={postsData}
-          renderItem={({ item }) => <Card item={item} />}
-          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <Card item={item} route={route.name} />}
+          keyExtractor={(item, index) => index.toString()}
           ListHeaderComponent={() => (
             <View style={styles.box}>
               <View style={styles.photoBox}>
