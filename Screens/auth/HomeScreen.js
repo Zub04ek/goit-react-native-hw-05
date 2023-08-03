@@ -8,7 +8,8 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import PostsScreen from "../main/PostsScreen";
 import CreatePostsScreen from "../main/CreatePostsScreen";
 import ProfileScreen from "../main/ProfileScreen";
-import CommentsScreen from "../main/CommentsScreen";
+import CommentsScreen from "../nestedScreens/CommentsScreen";
+import MapScreen from "../nestedScreens/MapScreen";
 
 const MainTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -97,7 +98,6 @@ const HomeTabs = () => {
 };
 
 export const HomeScreen = () => {
-  const navigation = useNavigation();
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -111,7 +111,17 @@ export const HomeScreen = () => {
         name="Comments"
         component={CommentsScreen}
         options={{
-          tabBarStyle: { display: "none" },
+          headerTitleAlign: "center",
+          headerStyle: {
+            borderWidth: 1,
+            borderColor: "#BDBDBD",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Map"
+        component={MapScreen}
+        options={{
           headerTitleAlign: "center",
           headerStyle: {
             borderWidth: 1,
