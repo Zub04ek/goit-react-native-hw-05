@@ -18,16 +18,22 @@ import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 const initialState = {
   photo: null,
   title: "",
-  location: "",
+  location: {
+    caption: "",
+    latitude: null,
+    longitude: null,
+  },
 };
 
 const CreatePostsScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
   const [camera, setCamera] = useState(null);
@@ -48,7 +54,14 @@ const CreatePostsScreen = () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       await MediaLibrary.requestPermissionsAsync();
 
-      setHasPermission(status === "granted");
+      let { status: locationStatus } =
+        await Location.requestForegroundPermissionsAsync();
+      if (locationStatus !== "granted") {
+        alert("Permission to access location was denied");
+      }
+      if (status === "granted" && locationStatus === "granted") {
+        setHasPermission(status === "granted");
+      }
     })();
   }, []);
 
@@ -56,7 +69,7 @@ const CreatePostsScreen = () => {
     return <View />;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>No access to camera or map</Text>;
   }
   if (!fontsLoaded) {
     return null;
@@ -87,16 +100,30 @@ const CreatePostsScreen = () => {
     }
   };
 
-  // const editPhoto = () => {
-  //   setState((prevState) => {
-  //       return { ...prevState, photo: ''};
-  //   });
-  //   console.log('edit')
-    
-  // }
+  const getLocation = async () => {
+    const {
+      coords: { latitude, longitude },
+    } = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+      maximumAge: 10000,
+    });
+
+    setState((prevState) => {
+      return {
+        ...prevState,
+        location: { ...prevState.location, latitude, longitude },
+      };
+    });
+  };
 
   const allDataFilled = () => {
-    if (state.photo && state.title && state.location) {
+    if (
+      state.photo &&
+      state.title &&
+      state.location.caption &&
+      state.location.latitude &&
+      state.location.longitude
+    ) {
       setIsFormFilled(true);
     } else {
       setIsFormFilled(false);
@@ -105,7 +132,7 @@ const CreatePostsScreen = () => {
 
   const publish = () => {
     setIsShowKeyboard(false);
-    navigation.navigate("Posts", {state});
+    navigation.navigate("Posts", { state });
     Keyboard.dismiss();
     setState(initialState);
     setIsFormFilled(false);
@@ -205,16 +232,20 @@ const CreatePostsScreen = () => {
                     color="#BDBDBD"
                   />
                   <TextInput
-                    value={state.location}
+                    value={state.location.caption}
                     onChangeText={(value) =>
-                      setState((prevState) => ({
-                        ...prevState,
-                        location: value,
-                      }))
+                      setState((prevState) => {
+                        return {
+                          ...prevState,
+                          location: { ...prevState.location, caption: value },
+                        };
+                      })
                     }
-                    onFocus={() => {
+                    onFocus={async () => {
+                      await getLocation();
                       setIsShowKeyboard(true);
                       setInputFocused((prev) => ({ ...prev, location: true }));
+                      allDataFilled();
                     }}
                     onBlur={() => {
                       setInputFocused((prev) => ({ ...prev, location: false }));
