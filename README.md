@@ -1,17 +1,21 @@
 # Screenshots of project on Android emulator
 
-## 1. Posts Screen
+## 1. Posts Screen without posts
 
-![Posts Screen](./assets/screenshots/PostScreen.jpg)
+![Posts Screen without posts](./assets/screenshots/PostScreen-without-posts.jpg)
 
-## 2. Create post Screen
+## 2. CreatePostsScreen when the screen is open
 
-![Create post Screen](./assets/screenshots/CreatePostScreen.jpg)
+![CreatePostsScreen when the screen is open](./assets/screenshots/opened-CreatePostScreen.jpg)
 
-## 3. Profile Screen
+## 3. CreatePostScreen with fields filled
 
-![Profile Screen](./assets/screenshots/ProfileScreen.jpg)
+![CreatePostScreen with fields filled](./assets/screenshots/CreatePostScreen-with-fields-filled.jpg)
 
-## 4. Comments Screen
+## 4. PostScreen after publishing post
 
-![Comments Screen](./assets/screenshots/CommentsScreen.jpg)
+![PostScreen after publishing post](./assets/screenshots/PostScreen-after-publishing-post.jpg)
+
+## 5. MapScreen with opened map
+
+![MapScreen with opened map](./assets/screenshots/MapScreen-with-opened-map.jpg)
